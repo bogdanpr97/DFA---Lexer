@@ -1,15 +1,26 @@
+var fs = require("fs");
+
+// fs.readFile("temp.txt", function(err, buf) {
+//   console.log(buf.toString());
+// });
+// fs.writeFile("temp.txt", "123 \n 321", function(err, data) {
+//   if (err) console.log(err);
+//   console.log("Successfully Written to File.");
+// });
+
 let values = [];
 
-import {
+var data = require("./data.js");
+const {
   TokenType,
-  Keyword,
+  keywords,
   operators,
   separators,
   comments,
   states,
   acceptingStates,
   statesType
-} from './data.js';
+} = data;
 
 class Token {
   constructor(typeIndex, valueIndex) {
@@ -23,7 +34,12 @@ class Lexer {
     this.input = input;
   }
 
-  nextToken() {}
+  nextToken(currentState, characterInput) {
+    switch(currentState) {
+      case 0:
+        if(characterInput === )
+    }
+  }
 }
 
 class FSM {

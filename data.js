@@ -251,13 +251,24 @@ let statesType = {
   '58': 'Operator'
 };
 
-export {
-  TokenType,
-  Keyword,
+// export {
+//   TokenType,
+//   Keyword,
+//   operators,
+//   separators,
+//   comments,
+//   states,
+//   acceptingStates,
+//   statesType
+// };
+
+module.exports = {
+    TokenType,
+  keywords,
   operators,
   separators,
   comments,
   states,
   acceptingStates,
   statesType
-};
+}
