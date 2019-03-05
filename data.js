@@ -147,8 +147,7 @@ let states = [
   54,
   55,
   56,
-  57,
-  58
+  57
 ];
 
 let acceptingStates = [
@@ -156,49 +155,48 @@ let acceptingStates = [
   2,
   4,
   6,
-  7,
+  7, // operatori
   8,
   9,
+  10, // -
   11,
+  12,
+  13, // *
   14,
+  15, // %
   16,
+  17, // =
   18,
-  19,
+  19, // |
   20,
   21,
-  22,
+  22, // &
   23,
   24,
-  25,
-  26,
-  27,
+  25, // .
+  26, // ~
+  27, // >
   28,
   29,
   30,
-  31,
+  31, // <
   32,
   33,
   34,
-  35,
+  35, // !
   36,
-  37,
+  37, // ^
   38,
-  39,
-  40,
-  41,
-  42,
-  43,
+  39, // separatori
+  40, // /
   44,
   45,
   46,
   47,
   48,
-  49,
   50,
-  51,
-  52,
-  53,
-  58
+  54,
+  57 // #
 ];
 
 let statesType = {
@@ -207,14 +205,19 @@ let statesType = {
   '4': 'Number',
   '6': 'Identifier',
   '7': 'Operator',
-  '8': 'Separator',
+  '8': 'Operator',
   '9': 'Operator',
-  '11': 'Comment',
-  '14': 'Comment',
-  '16': 'String',
-  '18': 'String',
-  '19': 'Comment',
-  '20': 'Comment',
+  '10': 'Operator',
+  '11': 'Operator',
+  '12': 'Operator',
+  '13': 'Operator',
+  '14': 'Operator',
+  '15': 'Operator',
+  '16': 'Operator',
+  '17': 'Operator',
+  '18': 'Operator',
+  '19': 'Operator',
+  '20': 'Operator',
   '21': 'Operator',
   '22': 'Operator',
   '23': 'Operator',
@@ -233,37 +236,20 @@ let statesType = {
   '36': 'Operator',
   '37': 'Operator',
   '38': 'Operator',
-  '39': 'Operator',
+  '39': 'Separator',
   '40': 'Operator',
-  '41': 'Operator',
-  '42': 'Operator',
-  '43': 'Operator',
-  '44': 'Operator',
-  '45': 'Operator',
-  '46': 'Operator',
-  '47': 'Operator',
+  '44': 'Comment',
+  '45': 'Comment',
+  '46': 'Comment',
+  '47': 'Comment',
   '48': 'Operator',
-  '49': 'Operator',
-  '50': 'Operator',
-  '51': 'Operator',
-  '52': 'Operator',
-  '53': 'Operator',
-  '58': 'Operator'
+  '50': 'String',
+  '54': 'String',
+  '57': 'Operator'
 };
 
-// export {
-//   TokenType,
-//   Keyword,
-//   operators,
-//   separators,
-//   comments,
-//   states,
-//   acceptingStates,
-//   statesType
-// };
-
 module.exports = {
-    TokenType,
+  TokenType,
   keywords,
   operators,
   separators,
@@ -271,4 +257,4 @@ module.exports = {
   states,
   acceptingStates,
   statesType
-}
+};
