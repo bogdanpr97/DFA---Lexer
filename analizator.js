@@ -306,7 +306,7 @@ class FSM {
     }
   }
   checkForAcceptingStates(currentState, buffer) {
-        console.log('bufferul - ', buffer)
+        // console.log('bufferul - ', buffer)
         if (this.acceptingStates.includes(currentState)) {
           if (
             statesType[currentState] === 'Identifier' &&
@@ -349,9 +349,8 @@ class FSM {
     for (let i = 0; i < length; i++) {
       let character = input[i];
       let theNextState = this.nextState(currentState, character);
-      console.log(i, '   ', character, '   ',theNextState);
+      // console.log(i, '   ', character, '   ',theNextState);
       if (theNextState === NO_NEXT_STATE) {
-        console.log('gata')
         r = this.checkForAcceptingStates(currentState, buffer);
         return r;
       }
@@ -409,7 +408,7 @@ class Lexer {
     if(this.position > this.fileLength) {
       return null;
     }
-    while(this.inputFile[this.position] === " " || this.inputFile[this.position] === '/n') {
+    while(this.inputFile[this.position] === " " || this.inputFile[this.position] === '\n') {
       if (this.inputFile[this.position] === " ") {
         this.position += 1;
         this.column +=1;
@@ -422,7 +421,7 @@ class Lexer {
     if(this.position > this.fileLength) {
       return null;
     }
-    console.log('pos', this.position, 'len', this.fileLength, 'incepFile', this.inputFile.slice(this.position, this.fileLength));
+    console.log('pos', this.position, 'len', this.fileLength);
 
     let token = this.fsm.run(this.inputFile.slice(this.position, this.fileLength));
     console.log('am gasit tokenul', token);
@@ -440,9 +439,9 @@ class Lexer {
           }
         }
         if(token.typeIndex === 3) {
-          return this.getToken();
+          return this.nextToken();
         }  
-        token.valueIndex = parseInt(token.value, 10);      
+        token.valueIndex = parseInt(token.valueIndex, 10);      
         token.typeIndex = parseInt(token.typeIndex, 10);   
         return token;   
       } else {
@@ -464,26 +463,30 @@ class Lexer {
   }
 }
 
-fs.readFile("temp.txt", "utf8", function(err, fileString) {
-  console.log('am citit fisierul',fileString);
+fs.readFile("test1.txt", "utf8", function(err, fileString) {
+  // console.log('am citit fisierul',fileString);
   let dfa = new FSM(states, 0, acceptingStates, statesType);
-  console.log(fileString)
   let analizer = new Lexer(dfa, fileString, 0, 1, 1);
   let fileToWrite = "";
   while(true) {
     token = analizer.nextToken();
+
     if(token) {
       if(analizer.getTokenValue(token) === 'Invalid') {
         fileToWrite = fileToWrite + "Invalid - (" + token.valueIndex + ") , poz: " + (analizer.position - len(token.valueIndex)).toString(); 
         break;
       } else{
-        fileToWrite = fileToWrite + analizer.getTokenType(token) + " - " + analizer.getTokenValue(token);
+        fileToWrite = fileToWrite + analizer.getTokenType(token) + " - " + analizer.getTokenValue(token) + "\n";
         analizer.setValues(values);
       }
+    } else {
+      break;
     }
   }
-  
-  // fs.writeFile("temp.txt", "", function(err, data) {
+  console.log('VALUES', values);
+
+  console.log('fisierul', fileToWrite);
+  // fs.writeFile("tempans.txt", "", function(err, data) {
   //         if (err) console.log(err);
   //         console.log("Successfully Written to File.");
   //       });
