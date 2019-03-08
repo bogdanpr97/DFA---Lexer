@@ -1,8 +1,6 @@
 var fs = require('fs');
 
-// fs.readFile("temp.txt", function(err, buf) {
-//   console.log(buf.toString());
-// });
+
 // fs.writeFile("temp.txt", "123 \n 321", function(err, data) {
 //   if (err) console.log(err);
 //   console.log("Successfully Written to File.");
@@ -33,14 +31,6 @@ class Token {
     this.typeIndex = typeIndex;
     this.valueIndex = valueIndex;
   }
-}
-
-class Lexer {
-  constructor(input) {
-    this.input = input;
-  }
-
-  nextToken() {}
 }
 
 class FSM {
@@ -84,7 +74,7 @@ class FSM {
           return 35;
         } else if (input === '^') {
           return 37;
-        } else if (separators.contains(input)) {
+        } else if (separators.includes(input)) {
           return 39;
         } else if (input === '/') {
           return 40;
@@ -95,7 +85,7 @@ class FSM {
         } else if (input === '#') {
           return 57;
         }
-        break;
+        return NO_NEXT_STATE;
       // start numar
       case 1:
         if (input.match(regexValues.numbers)) {
@@ -105,41 +95,40 @@ class FSM {
         } else if (input === 'e') {
           return 3;
         }
-        break;
+        return NO_NEXT_STATE;
       case 2:
         if (input.match(regexValues.numbers)) {
           return 2;
         } else if (input === 'e') {
           return 3;
         }
-        break;
+        return NO_NEXT_STATE;
       case 3:
         if (input.match(regexValues.numbers)) {
           return 4;
         } else if (input === '-') {
           return 5;
         }
-        break;
+        return NO_NEXT_STATE;
       case 4:
         if (input.match(regexValues.numbers)) {
           return 4;
         }
-        break;
+        return NO_NEXT_STATE;
       case 5:
         if (input.match(regexValues.numbers)) {
           return 4;
         }
-        break;
+        return NO_NEXT_STATE;
       case 6:
         if (
           input === '_' ||
-          input.match(
-            regexValues.characters || input.match(regexValues.numbers)
+         input.match(regexValues.characters) || input.match(regexValues.numbers)
           )
-        ) {
+         {
           return 6;
         }
-        break;
+      return NO_NEXT_STATE;  
       //  operatori
       case 7:
         if (input === '+') {
@@ -147,77 +136,77 @@ class FSM {
         } else if (input === '=') {
           return 9;
         }
-        break;
+        return NO_NEXT_STATE;
       case 10:
         if (input === '-') {
           return 11;
         } else if (input === '=') {
           return 12;
         }
-        break;
+        return NO_NEXT_STATE;
       case 13:
         if (input === '=') {
           return 14;
         }
-        break;
+        return NO_NEXT_STATE;
       case 15:
         if (input === '=') {
           return 16;
         }
-        break;
+        return NO_NEXT_STATE;
       case 17:
         if (input === '=') {
           return 18;
         }
-        break;
+        return NO_NEXT_STATE;
       case 19:
         if (input === '|') {
           return 20;
         } else if (input === '=') {
           return 21;
         }
-        break;
+        return NO_NEXT_STATE;
       case 22:
         if (input === '&') {
           return 23;
         } else if (input === '=') {
           return 24;
         }
-        break;
+        return NO_NEXT_STATE;
       case 27:
         if (input === '>') {
           return 28;
         } else if (input === '=') {
           return 30;
         }
-        break;
+        return NO_NEXT_STATE;
       case 28:
         if (input === '=') {
           return 29;
         }
-        break;
+        return NO_NEXT_STATE;
       case 31:
         if (input === '<') {
           return 32;
         } else if (input === '=') {
           return 34;
         }
-        break;
+        return NO_NEXT_STATE;
       case 32:
         if (input === '=') {
           return 33;
         }
-        break;
+        return NO_NEXT_STATE;
       case 35:
         if (input === '=') {
           return 36;
         }
-        break;
+        return NO_NEXT_STATE;
       case 37:
         if (input === '=') {
           return 38;
         }
-        break;
+        return NO_NEXT_STATE;
       //  INCEPUT COMENTARII
       //  BRANCH 1
       case 40:
@@ -228,28 +217,28 @@ class FSM {
         } else if (input === '=') {
           return 48;
         }
-        break;
+        return NO_NEXT_STATE;
       case 41:
         if (input !== '*') {
           return 42;
         } else if (input === '*') {
           return 43;
         }
-        break;
+        return NO_NEXT_STATE;
       case 42:
         if (input !== '*') {
           return 42;
         } else if (input === '*') {
           return 43;
         }
-        break;
+        return NO_NEXT_STATE;
       case 43:
         if (input !== '/') {
           return 42;
         } else if (input === '/') {
           return 44;
         }
-        break;
+        return NO_NEXT_STATE;
       //  BRANCH 2
       case 45:
         if (input !== '\\') {
@@ -272,7 +261,7 @@ class FSM {
         } else if (input === '\\') {
           return 51;
         }
-        break;
+        return NO_NEXT_STATE;
       case 51:
         if (input !== '\n') {
           return 49;
@@ -296,7 +285,7 @@ class FSM {
         } else if (input === '\\') {
           return 55;
         }
-        break;
+        return NO_NEXT_STATE;
       case 55:
         if (input !== '\n') {
           return 53;
@@ -314,24 +303,14 @@ class FSM {
       // GATA COMENTARII
       default:
         return NO_NEXT_STATE;
-        break;
     }
   }
-
-  run(input) {
-    let currentState = this.initialState;
-    let length = input.length;
-    let buffer = '';
-
-    for (let i = 0; i < length; i++) {
-      console.log(i, '   ');
-      let character = input[i];
-      let theNextState = this.nextState(currentState, character);
-      if (theNextState === NO_NEXT_STATE) {
-        if (this.acceptingStates.contains(currentState)) {
+  checkForAcceptingStates(currentState, buffer) {
+        console.log('bufferul - ', buffer)
+        if (this.acceptingStates.includes(currentState)) {
           if (
             statesType[currentState] === 'Identifier' &&
-            keywords.contains(buffer)
+            keywords.includes(buffer)
           ) {
             return new Token(
               TokenType.indexOf('Keyword'),
@@ -347,7 +326,7 @@ class FSM {
               TokenType.indexOf('Separator'),
               operators.indexOf(buffer)
             );
-          } else if (values.contains(buffer)) {
+          } else if (values.includes(buffer)) {
             return new Token(
               TokenType.indexOf(statesType[currentState]),
               values.indexOf(buffer)
@@ -360,12 +339,152 @@ class FSM {
             );
           }
         }
+  }
+
+  run(input) {
+    let currentState = this.initialState;
+    let length = input.length;
+    let buffer = '';
+    let r;
+    for (let i = 0; i < length; i++) {
+      let character = input[i];
+      let theNextState = this.nextState(currentState, character);
+      console.log(i, '   ', character, '   ',theNextState);
+      if (theNextState === NO_NEXT_STATE) {
+        console.log('gata')
+        r = this.checkForAcceptingStates(currentState, buffer);
+        return r;
       }
-      buffer = buffer + character;
+      buffer = buffer + character; 
       currentState = theNextState;
     }
+    r = this.checkForAcceptingStates(currentState, buffer);
+    return r;
   }
 }
 
-let dfa = new FSM([0, 1, 2, 3], 0, [1], 'red');
-dfa.run('abc');
+class Lexer {
+  constructor(fsm, inputFile, position, line, column) {
+    this.fsm = fsm;
+    this.inputFile = inputFile;
+    this.fileLength = inputFile.length;
+    this.position = position;
+    this.line = line;
+    this.column = column;
+  }
+
+  setValues(values) {
+    this.values = values;
+  }
+
+  checkEndOfLine() {
+    if(this.position > this.fileLength) {
+      return true;
+    }
+    return false;
+  }
+
+  getTokenType(token) {
+    return TokenType[token.typeIndex];
+  }
+
+  getTokenValue(token) {
+    switch(token.typeIndex) {
+      case 0:
+        return keywords[token.valueIndex];
+      case 1:
+        return operators[token.valueIndex];
+      case 2:
+        return separators[token.valueIndex];
+      default:
+        return values[token.valueIndex];
+    }
+  }
+
+  setValues(values) {
+    this.values
+  }
+
+  nextToken() {
+    if(this.position > this.fileLength) {
+      return null;
+    }
+    while(this.inputFile[this.position] === " " || this.inputFile[this.position] === '/n') {
+      if (this.inputFile[this.position] === " ") {
+        this.position += 1;
+        this.column +=1;
+      } else {
+        this.position += 1;
+        this.line += 1;
+        this.column = 0;
+      }
+    }
+    if(this.position > this.fileLength) {
+      return null;
+    }
+    console.log('pos', this.position, 'len', this.fileLength, 'incepFile', this.inputFile.slice(this.position, this.fileLength));
+
+    let token = this.fsm.run(this.inputFile.slice(this.position, this.fileLength));
+    console.log('am gasit tokenul', token);
+    if(token) {
+      if(token.typeIndex !== 7) {
+        let value = this.getTokenValue(token);
+        for (let i = 0; i < value.length; i++) {
+          if(value[i] === '\n') {
+            this.position += 1;
+            this.column = 0;
+            this.line += 1;
+          } else {
+            this.position += 1;
+            this.column += 1;
+          }
+        }
+        if(token.typeIndex === 3) {
+          return this.getToken();
+        }  
+        token.valueIndex = parseInt(token.value, 10);      
+        token.typeIndex = parseInt(token.typeIndex, 10);   
+        return token;   
+      } else {
+        value = token.valueIndex;
+        for (let i = 0; i < value.length; i++) {
+          if(value[i] === '\n') {
+            this.position += 1;
+            this.column = 0;
+            this.line += 1;
+          } else {
+            this.position += 1;
+            this.column += 1;
+          }
+        }
+        return token;
+      }
+    }
+    return null;
+  }
+}
+
+fs.readFile("temp.txt", "utf8", function(err, fileString) {
+  console.log('am citit fisierul',fileString);
+  let dfa = new FSM(states, 0, acceptingStates, statesType);
+  console.log(fileString)
+  let analizer = new Lexer(dfa, fileString, 0, 1, 1);
+  let fileToWrite = "";
+  while(true) {
+    token = analizer.nextToken();
+    if(token) {
+      if(analizer.getTokenValue(token) === 'Invalid') {
+        fileToWrite = fileToWrite + "Invalid - (" + token.valueIndex + ") , poz: " + (analizer.position - len(token.valueIndex)).toString(); 
+        break;
+      } else{
+        fileToWrite = fileToWrite + analizer.getTokenType(token) + " - " + analizer.getTokenValue(token);
+        analizer.setValues(values);
+      }
+    }
+  }
+  
+  // fs.writeFile("temp.txt", "", function(err, data) {
+  //         if (err) console.log(err);
+  //         console.log("Successfully Written to File.");
+  //       });
+});
