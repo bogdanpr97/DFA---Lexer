@@ -23,7 +23,8 @@ const {
 
 const regexValues = {
   numbers: /[0-9]/g,
-  characters: /[a-zA-Z]/g
+  characters: /[a-zA-Z]/g,
+  rChar: /\r/g,
 };
 
 class Token {
@@ -324,7 +325,7 @@ class FSM {
           } else if (statesType[currentState] === 'Separator') {
             return new Token(
               TokenType.indexOf('Separator'),
-              operators.indexOf(buffer)
+              separators.indexOf(buffer)
             );
           } else if (values.includes(buffer)) {
             return new Token(
@@ -338,7 +339,13 @@ class FSM {
               values.indexOf(buffer)
             );
           }
-        }
+        } else {
+        values.push(buffer);
+        return new Token(
+              TokenType.indexOf("Invalid"),
+              buffer
+            );
+    }
   }
 
   run(input) {
@@ -349,7 +356,7 @@ class FSM {
     for (let i = 0; i < length; i++) {
       let character = input[i];
       let theNextState = this.nextState(currentState, character);
-      // console.log(i, '   ', character, '   ',theNextState);
+      console.log(i, '   ', character, '   ',theNextState);
       if (theNextState === NO_NEXT_STATE) {
         r = this.checkForAcceptingStates(currentState, buffer);
         return r;
@@ -357,8 +364,8 @@ class FSM {
       buffer = buffer + character; 
       currentState = theNextState;
     }
-    r = this.checkForAcceptingStates(currentState, buffer);
-    return r;
+     r = this.checkForAcceptingStates(currentState, buffer);
+     return r; 
   }
 }
 
@@ -405,7 +412,7 @@ class Lexer {
   }
 
   nextToken() {
-    if(this.position > this.fileLength) {
+    if(this.position >= this.fileLength) {
       return null;
     }
     while(this.inputFile[this.position] === " " || this.inputFile[this.position] === '\n') {
@@ -418,10 +425,10 @@ class Lexer {
         this.column = 0;
       }
     }
-    if(this.position > this.fileLength) {
+    if(this.position >= this.fileLength) {
       return null;
     }
-    console.log('pos', this.position, 'len', this.fileLength);
+    // console.log('pos', this.position, 'len', this.fileLength);
 
     let token = this.fsm.run(this.inputFile.slice(this.position, this.fileLength));
     console.log('am gasit tokenul', token);
@@ -445,7 +452,7 @@ class Lexer {
         token.typeIndex = parseInt(token.typeIndex, 10);   
         return token;   
       } else {
-        value = token.valueIndex;
+        let value = token.valueIndex;
         for (let i = 0; i < value.length; i++) {
           if(value[i] === '\n') {
             this.position += 1;
@@ -463,18 +470,20 @@ class Lexer {
   }
 }
 
-fs.readFile("test1.txt", "utf8", function(err, fileString) {
+fs.readFile("aici.txt", "utf8", function(err, fileString) {
   // console.log('am citit fisierul',fileString);
   let dfa = new FSM(states, 0, acceptingStates, statesType);
+  fileString = fileString.replace(/\r/g,'\n');
   let analizer = new Lexer(dfa, fileString, 0, 1, 1);
   let fileToWrite = "";
   while(true) {
     token = analizer.nextToken();
 
-    if(token) {
-      if(analizer.getTokenValue(token) === 'Invalid') {
-        fileToWrite = fileToWrite + "Invalid - (" + token.valueIndex + ") , poz: " + (analizer.position - len(token.valueIndex)).toString(); 
-        break;
+    if(token !== null) {
+
+      if(analizer.getTokenValue(token) === undefined) {
+
+        fileToWrite = fileToWrite + "Invalid - (" + token.valueIndex + ")" + '\n';
       } else{
         fileToWrite = fileToWrite + analizer.getTokenType(token) + " - " + analizer.getTokenValue(token) + "\n";
         analizer.setValues(values);
